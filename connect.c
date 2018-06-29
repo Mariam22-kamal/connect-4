@@ -34,6 +34,57 @@ void print(char** arr)
     }
     return;
 }
+int count(char** arr,char ch)
+{
+    int num=0;
+    for(int i=0;i<6;i++)
+    {
+        for(int j=0;j<5;j++)
+        {
+            if(arr[i][j]==arr[i][j+1]  && arr[i][j]==arr[i][j+2])
+            {
+                if(arr[i][j]==ch)
+                num++;
+
+            }
+        }
+    }
+    for(int j=0;j<7;j++)
+    {
+        for(int i=0;i<4;i++)
+        {
+            if(arr[i][j]==arr[i+1][j]  && arr[i][j]==arr[i+2][j]  )
+            {
+                 if(arr[i][j]==ch)
+                num++;
+            }
+        }
+    }
+    int count=0;
+    for(int i=0;i<4;i++)
+    {
+        for(int j=0;j<5;j++)
+        {
+            if(arr[i][j]==arr[i+1][j+1] && arr[i][j]==arr[i+2][j+2] )
+            {
+                 if(arr[i][j]==ch)
+                num++;
+            }
+        }
+    }
+    for(int i=0;i<4;i++)
+    {
+        for(int j=2;j<7;j++)
+        {
+            if(arr[i][j]==arr[i+1][j-1] && arr[i][j]==arr[i+2][j-2] )
+            {
+                 if(arr[i][j]==ch)
+               num++;
+            }
+        }
+    }
+    return num;
+}
 int evaluate(char** arr)
 {
     for(int i=0;i<6;i++)
@@ -62,7 +113,7 @@ int evaluate(char** arr)
             }
         }
     }
-    int count=0;
+
     for(int i=0;i<3;i++)
     {
         for(int j=0;j<4;j++)
@@ -89,19 +140,14 @@ int evaluate(char** arr)
             }
         }
     }
-    return 0;
+    return count(arr,me)*10-count(arr,you)*10;
 }
 int minmax(char** arr,int depth,int turn,int alpha,int beta)
 {
     int score=evaluate(arr);
-    //printf("%d\n",score);
-    //if(score!=0 && depth==7)  return score*10;
-    //if(score!=0 && depth==6)  return score*5;
-    //if(score!=0 && depth==5)  return score*3;
-    //if(score!=0 && depth==4)  return score*2;
-    if(score!=0)  return score;
+    if(score==1000 || score==-1000)  return score;
     if(end(arr)==1)  return 0;
-    if(depth==0)  return 0;
+    if(depth==0)  return score;
     if(turn%2==1)
     {
         int max=-1111111;
@@ -175,12 +221,17 @@ int minmax(char** arr,int depth,int turn,int alpha,int beta)
         return max+depth;
     }
 }
+double on=0;
 int chance(char** arr,int f,int luck)
 {
+    double inc=1/4.0;
     double best=-100000;
     int bestmove=-1;
     double moves[7];
     int curr;
+    if(on>=2)  inc=1/3.0;
+    if(on>=3)  inc=0.5;
+    on+=inc;
     for(int i=0;i<7;i++)
     {
        // printf("%d",i);
@@ -191,7 +242,7 @@ int chance(char** arr,int f,int luck)
             if(arr[j][i]=='-')
             {
                 arr[j][i]=me;
-                curr=minmax(arr,8 ,0,-99999999,99999999);
+                curr=minmax(arr,8+(int)on ,0,-99999999,99999999);
                 int score=evaluate(arr);
                 if(score==1000)  curr=10000;
                 moves[i]=curr;
@@ -235,6 +286,7 @@ int chance(char** arr,int f,int luck)
             bestmove=3+i;
         }
     }
+   // printf("#%d#\n",8+(int)on);
     return bestmove;
 }
 int isend(char** arr)
@@ -329,6 +381,7 @@ int main()
      int f=1;
      while(depth<45)
      {
+        // printf("%d",count(arr,me));
          f++;
          int x,y;
          printf("Make your move: ");
